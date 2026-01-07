@@ -1,0 +1,26 @@
+include:
+  - local: '.publish-scripts-prod.yml'
+
+publish:publish_sdk_to_github:prod:
+  stage: deploy
+  cache: [ ]
+  interruptible: true
+  needs:
+    - job: publish:prod
+      artifacts: true
+  rules:
+    - if: $IS_WS_CRON == "true" || $IS_CHECK_DEPS == "true"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $PROD_BRANCH && $DEPLOY == "true"
+  before_script:
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
+    - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
+    - apt-get update && apt-get install -y jq
+  script:
+    - !reference [ .ios_deploy_vars_prepare_script, script ]
+    - FRAMEWORK_URL="${GITHUB_BASE_URL}/${GITHUB_REPO}/releases/download/v${PROJECT_VERSION}/${IOS_FRAMEWORK_NAME}.xcframework.zip"
+    - CARTHAGE_FILE_URL="${GITHUB_BASE_URL}/${GITHUB_REPO}/${IOS_FRAMEWORK_NAME}.json"
+    - !reference [ .ios_manifests_prepare_script, script ]
+    # GitHub release
+    - !reference [ .publish_to_github, script ]

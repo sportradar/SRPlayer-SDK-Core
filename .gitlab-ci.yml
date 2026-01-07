@@ -1,0 +1,51 @@
+include:
+  - project: 'MobileApps/mobile-gitlab-ci'
+    file: 'kmp-lib.yml'
+
+  - project: 'MobileApps/mobile-gitlab-ci'
+    file: '.common-pitest.yml'
+
+  - local: '.publish-prod.yml'
+
+variables:
+  DEPLOY:
+    value: "true"
+    description: "Whether to run the deployment pipeline or just a verification job. This has no effect on the develop branch as it will always deploy the dev build from there. Allowed values: true, false"
+  MODULE_NAME:
+    value: "av-player-data-sdk"
+    description: "The name of the common module folder, e.g. shared."
+  IOS_FRAMEWORK_NAME:
+    value: "AVPlayerDataSDK"
+    description: "The name of the iOS framework that will be generated. The name should use CapitalizedCase and should match the framework name in the project's shared build.gradle."
+  SPM_TOOLS_VERSION:
+    value: '6.0'
+    description: "The version in the `// swift-tools-version:$SPM_TOOLS_VERSION` declaration of the generated Package.swift manifest."
+  SPM_PLATFORMS:
+    value: ".iOS(.v16),.tvOS(.v16),.macOS(.v14),.visionOS(.v1)"
+    description: "The list of supported platforms in the generated Package.swift manifest."
+  DOKKA:
+    value: "true"
+    description: "Whether to build and publish Dokka artifacts. Allowed values: true, false"
+  IOS_FRAMEWORK_ARTEFACTS:
+    value: "publish"
+    description: "Whether to build and/or publish the native XCFramework for iOS as well (set to build/publish) or only build and publish the KMP artefacts (set to none). Allowed values: none, build, publish"
+  USE_CHANGELOG_FEATURE:
+    value: "true"
+    description: "Whether to use changelog feature. Allowed values: true, false [required]"
+  USE_SLACK_FEATURE:
+    value: "true"
+    description: "Whether to use slack feature. Allowed values: true, false [required]"
+  JIRA_TICKET_PATTERN:
+    value: "MOTT"
+    description: "Ticket pattern for changelog [required]. Else, feature collecting title from jira will be excluded."
+  SLACK_CHANNEL_ID:
+    value: "C09GM0RNGT0"
+    description: "Slack channel id [required].  Else, feature sending notification to slack will be excluded."
+  MERGE_REQUEST_REVIEWS:
+    value: "u.kobal,z.colakovic,c.frank,a.becher,t.melzer,b.filipovic"
+    description: "List of reviewers username. [optional]"
+  PROD_BRANCH:
+    value: "main"
+    description: "The name of the branch for production code."
+  GITHUB_BASE_URL: "https://github.com/sportradar"
+  GITHUB_REPO: "SRPlayer-SDK-Core"

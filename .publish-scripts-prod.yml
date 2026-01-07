@@ -1,0 +1,64 @@
+.github_release_data_prepare_script:
+  script: &github_release_data_prepare_script
+    - |
+      RELEASE_DATA=$(cat <<EOF
+      {
+        "tag_name": "v${PROJECT_VERSION}",
+        "name": "Release v${PROJECT_VERSION}",
+        "body": "Release version ${PROJECT_VERSION}",
+        "draft": false,
+        "prerelease": false
+      }
+      EOF
+      )
+
+.github_release_create_script:
+  script: &github_release_create_script
+    - |
+      RELEASE_RESPONSE=$(curl -s -X POST \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -H "Accept: application/vnd.github.v3+json" \
+        https://api.github.com/repos/sportradar/${GITHUB_REPO}/releases \
+        -d "${RELEASE_DATA}")
+    - echo "Release response:" && echo "${RELEASE_RESPONSE}" | jq .
+
+.github_release_upload_url_script:
+  script: &github_release_upload_url_script
+    - UPLOAD_URL=$(echo "${RELEASE_RESPONSE}" | jq -r .upload_url | sed 's/{?name,label}//')
+
+.github_release_upload_xcframework_script:
+  script: &github_release_upload_xcframework_script
+    - |
+      curl -X POST \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -H "Content-Type: application/zip" \
+        --data-binary @"${IOS_FRAMEWORK_NAME}/${PROJECT_VERSION}/${IOS_FRAMEWORK_NAME}.xcframework.zip" \
+        "${UPLOAD_URL}?name=${IOS_FRAMEWORK_NAME}.xcframework.zip"
+
+.github_package_swift_upload_script:
+  script: &github_package_swift_upload_script
+    - |
+      echo "Pushing Package.swift to GitHub"
+      TEMP_DIR=$(mktemp -d)
+      git clone https://x-access-token:${GITHUB_TOKEN}@github.com/sportradar/${GITHUB_REPO}.git ${TEMP_DIR}
+      cd ${TEMP_DIR}
+      git checkout -B ${CI_COMMIT_REF_NAME} || git checkout -b ${CI_COMMIT_REF_NAME}
+      cp ${CI_PROJECT_DIR}/${IOS_FRAMEWORK_NAME}/${PROJECT_VERSION}/Package.swift ./
+      git add Package.swift
+      if git diff-index --quiet HEAD; then
+        echo "No changes to Package.swift"
+      else
+        git config user.name "CI Automation"
+        git config user.email "ci@sportradar.ag"
+        git commit -m "Update Package.swift for ${PROJECT_VERSION}"
+        git push origin ${CI_COMMIT_REF_NAME}
+      fi
+      cd ${CI_PROJECT_DIR}
+
+.publish_to_github:
+  script:
+    - *github_release_data_prepare_script
+    - *github_release_create_script
+    - *github_release_upload_url_script
+    - *github_release_upload_xcframework_script
+    - *github_package_swift_upload_script

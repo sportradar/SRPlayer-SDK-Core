@@ -1,0 +1,9 @@
+#Latest licence for this subscription available at https://subscriptions.arcmutate.com/5735d44b-4a5d-4011-b22e-d1a1782e1651/arcmutate-licence.txt
+#Thu Apr 24 08:17:01 UTC 2025
+expires=10/04/2026
+signature=QlgSbWmrPInncpZnj1k7OotNw4kJN38EMkJsnxAUWc0KvurQsbLHZ6du0lWvPTOQ0pSlgUrzac5AmJqUNDcJZu9mOUBuZcOIi9V1cL+BSgmzZnYei8nmUrQ2KXjb3okm+rSw9nnZzM8zrbj6CgCLo+P1vu96VqoVWupo/TtSLcw\=
+packages=ag.sportradar.*,com.afc.*
+type=COMMERCIAL
+users=10
+products=EXTENSIONS,ACCELERATOR,KOTLIN
+keyVersion=1

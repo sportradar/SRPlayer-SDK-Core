@@ -1,0 +1,32 @@
+openapi: 3.0.1
+info:
+  title: AV Player Data SDK
+  description: AV Player Data SDK for Android and iOS apps.
+  x-cortex-git:
+    gitlab:
+      alias: default
+      repository: "23301"
+  x-cortex-tag: mobileapps-avplayer-av-player-data-sdk
+  x-cortex-type: service
+  x-cortex-groups: library
+  x-cortex-owners:
+    - name: Mobile Team
+      type: GROUP
+      provider: GITLAB
+    - name: fet-mobile-dev
+      type: GROUP
+      provider: CORTEX
+    - type: SLACK
+      channel: ott-mobile-dev
+      notificationsEnabled: true
+  x-cortex-static-analysis:
+    sonarqube:
+      project: mobile-app-av-player-data-sdk-kmp
+    mend:
+      projectIds:
+        - 18962651
+        - 18962653
+        - 18962652
+  x-cortex-dependency:
+    - tag: av-player-data-sdk
+      description: The API layer used by this SDK to access the OTT backend.
